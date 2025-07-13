@@ -1,0 +1,1 @@
+# Placeholder content for seguridad_service.py

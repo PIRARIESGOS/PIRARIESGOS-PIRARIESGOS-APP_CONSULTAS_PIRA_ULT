@@ -1,0 +1,1 @@
+# Placeholder content for init_db.py

@@ -1,0 +1,1 @@
+# Placeholder content for consulta_service.py

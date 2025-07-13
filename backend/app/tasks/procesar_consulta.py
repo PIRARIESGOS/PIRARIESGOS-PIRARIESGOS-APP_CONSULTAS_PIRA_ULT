@@ -1,0 +1,1 @@
+# Placeholder content for procesar_consulta.py
