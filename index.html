@@ -1,0 +1,2547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión Curso LA/FT - PIRA RIESGOS SAS</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPDF/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Acephimere&display=swap');
+
+        :root {
+            --pira-azul: #0072CE;
+            --pira-verde: #00B140;
+            --pira-purpura: #4E2A84;
+            --pira-rodamina: #E10098;
+        }
+
+        * {
+            font-family: 'Bahnschrift', 'Inter', sans-serif;
+        }
+
+        .pira-azul { background-color: var(--pira-azul); }
+        .pira-verde { background-color: var(--pira-verde); }
+        .pira-purpura { background-color: var(--pira-purpura); }
+        .pira-rodamina { background-color: var(--pira-rodamina); }
+
+        .text-pira-azul { color: var(--pira-azul); }
+        .text-pira-verde { color: var(--pira-verde); }
+        .text-pira-purpura { color: var(--pira-purpura); }
+        .text-pira-rodamina { color: var(--pira-rodamina); }
+
+        .border-pira-azul { border-color: var(--pira-azul); }
+        .border-pira-verde { border-color: var(--pira-verde); }
+
+        .btn-pira {
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-pira:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .acephimere-italic {
+            font-family: 'Acephimere', 'Inter', serif;
+            font-style: italic;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--pira-azul) 0%, var(--pira-verde) 100%);
+            height: 6px;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .module-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .module-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-placeholder {
+            background: linear-gradient(45deg, #f1f5f9, #e2e8f0);
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            color: #64748b;
+        }
+
+        .activity-card {
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid var(--pira-verde);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .question-option {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .question-option:hover {
+            background: #f1f5f9;
+            border-color: var(--pira-azul);
+        }
+
+        .question-option.selected {
+            background: #dbeafe;
+            border-color: var(--pira-azul);
+        }
+
+        .question-option.correct {
+            background: #dcfce7;
+            border-color: var(--pira-verde);
+        }
+
+        .question-option.incorrect {
+            background: #fef2f2;
+            border-color: #ef4444;
+        }
+
+        .fadeIn {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .floating-progress {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            border-radius: 50px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e2e8f0;
+        }
+
+        .certificate-template {
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            border: 3px solid var(--pira-azul);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .loading-spinner {
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid var(--pira-azul);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            padding: 16px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success { background: var(--pira-verde); }
+        .notification.error { background: #ef4444; }
+        .notification.info { background: var(--pira-azul); }
+
+        .auth-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--pira-azul) 0%, var(--pira-purpura) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--pira-azul);
+            box-shadow: 0 0 0 3px rgba(0, 114, 206, 0.1);
+        }
+
+        .input-label {
+            position: absolute;
+            left: 16px;
+            top: 12px;
+            color: #6b7280;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .input-field:focus + .input-label,
+        .input-field:not(:placeholder-shown) + .input-label {
+            top: -8px;
+            left: 12px;
+            font-size: 12px;
+            color: var(--pira-azul);
+            background: white;
+            padding: 0 4px;
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                margin: 20px;
+                padding: 24px;
+            }
+
+            .floating-progress {
+                bottom: 10px;
+                right: 10px;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Notification Container -->
+<div id="notification" class="notification"></div>
+
+<!-- Authentication Screen -->
+<div id="authScreen" class="auth-container">
+    <div class="form-container">
+        <div class="text-center mb-8">
+            <div class="w-20 h-20 mx-auto mb-4 bg-white rounded-full flex items-center justify-center shadow-lg">
+                <i class="fas fa-shield-alt text-3xl text-pira-azul"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">Acceso al Curso</h1>
+            <p class="text-gray-600">Sistema de Prevención de Lavado de Activos y Financiación del Terrorismo</p>
+        </div>
+
+        <form id="authForm" class="space-y-6">
+            <div class="input-group">
+                <input type="password" id="accessKey" class="input-field" placeholder=" " required>
+                <label class="input-label">Clave de Acceso</label>
+            </div>
+
+            <button type="submit" class="w-full btn-pira pira-azul text-white">
+                <span id="authButtonText">Ingresar</span>
+                <div id="authSpinner" class="loading-spinner hidden inline-block ml-2"></div>
+            </button>
+
+            <div id="authError" class="hidden text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg">
+                Clave incorrecta. Intente nuevamente.
+            </div>
+        </form>
+
+        <div class="text-center mt-8 pt-6 border-t border-gray-200">
+            <p class="text-sm text-gray-500">PIRA RIESGOS SAS</p>
+            <p class="text-xs text-gray-400">www.pira.com.co</p>
+        </div>
+    </div>
+</div>
+
+<!-- Registration Screen -->
+<div id="registrationScreen" class="hidden auth-container">
+    <div class="form-container">
+        <div class="text-center mb-8">
+            <div class="w-20 h-20 mx-auto mb-4 bg-white rounded-full flex items-center justify-center shadow-lg">
+                <i class="fas fa-user-plus text-3xl text-pira-verde"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">Registro de Usuario</h1>
+            <p class="text-gray-600">Complete sus datos para acceder al curso</p>
+        </div>
+
+        <form id="registrationForm" class="space-y-6">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="input-group">
+                    <select id="docType" class="input-field" required>
+                        <option value="">Seleccionar</option>
+                        <option value="C.C.">Cédula de Ciudadanía</option>
+                        <option value="C.E.">Cédula de Extranjería</option>
+                        <option value="NIT">NIT</option>
+                        <option value="Pasaporte">Pasaporte</option>
+                    </select>
+                    <label class="input-label">Tipo de Documento</label>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="docNumber" class="input-field" placeholder=" " pattern="[0-9]+" required>
+                    <label class="input-label">Número de Documento</label>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="fullName" class="input-field" placeholder=" " required>
+                <label class="input-label">Nombre Completo</label>
+            </div>
+
+            <button type="submit" class="w-full btn-pira pira-verde text-white">
+                <span id="regButtonText">Registrarse</span>
+                <div id="regSpinner" class="loading-spinner hidden inline-block ml-2"></div>
+            </button>
+
+            <div id="regError" class="hidden text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg"></div>
+            <div id="regSuccess" class="hidden text-green-600 text-sm text-center bg-green-50 p-3 rounded-lg"></div>
+        </form>
+    </div>
+</div>
+
+<!-- Welcome Back Screen -->
+<div id="welcomeBackScreen" class="hidden auth-container">
+    <div class="form-container text-center">
+        <div class="w-20 h-20 mx-auto mb-4 bg-white rounded-full flex items-center justify-center shadow-lg">
+            <i class="fas fa-hand-wave text-3xl text-pira-verde"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">¡Bienvenido de nuevo!</h1>
+        <p id="welcomeMessage" class="text-gray-600 mb-6"></p>
+        <p class="text-sm text-gray-500 mb-6">Te redirigiremos al módulo donde quedaste.</p>
+
+        <button id="continueBtn" class="btn-pira pira-azul text-white">
+            Continuar Curso
+        </button>
+    </div>
+</div>
+
+<!-- Main Course Application -->
+<div id="courseApp" class="hidden min-h-screen bg-gray-50">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b-2 border-pira-azul sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-pira-azul rounded-lg flex items-center justify-center mr-3">
+                        <i class="fas fa-graduation-cap text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-gray-900">Curso LA/FT y PTEE</h1>
+                        <p class="text-sm text-gray-500">PIRA RIESGOS SAS</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p id="userNameHeader" class="text-sm font-medium text-gray-700"></p>
+                        <p id="userDocHeader" class="text-xs text-gray-500"></p>
+                    </div>
+                    <button id="logoutBtn" class="text-gray-500 hover:text-red-500">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="bg-white border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium text-gray-700">Progreso del Curso</span>
+                <span id="progressText" class="text-sm text-pira-azul font-medium">0%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div id="progressBar" class="progress-bar w-0"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="bg-white border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex space-x-8 overflow-x-auto">
+                <button class="module-tab py-4 px-2 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-pira-azul hover:border-pira-azul whitespace-nowrap" data-module="1">
+                    <i class="fas fa-question-circle mr-2"></i>Módulo 1
+                </button>
+                <button class="module-tab py-4 px-2 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-pira-azul hover:border-pira-azul whitespace-nowrap" data-module="2">
+                    <i class="fas fa-shield-alt mr-2"></i>Módulo 2
+                </button>
+                <button class="module-tab py-4 px-2 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-pira-azul hover:border-pira-azul whitespace-nowrap" data-module="3">
+                    <i class="fas fa-balance-scale mr-2"></i>Módulo 3
+                </button>
+                <button class="module-tab py-4 px-2 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-pira-azul hover:border-pira-azul whitespace-nowrap" data-module="4">
+                    <i class="fas fa-tasks mr-2"></i>Módulo 4
+                </button>
+                <button class="module-tab py-4 px-2 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-pira-azul hover:border-pira-azul whitespace-nowrap" data-module="5">
+                    <i class="fas fa-certificate mr-2"></i>Módulo 5
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Module Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Module 1: ¿Por qué debo aprender esto? -->
+        <div id="module1" class="module-content">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">
+                    <i class="fas fa-question-circle text-pira-azul mr-3"></i>
+                    Módulo 1: ¿Por qué debo aprender esto?
+                </h2>
+                <p class="text-lg text-gray-600">Generar conciencia sobre la importancia del cumplimiento normativo en LA/FT y corrupción.</p>
+            </div>
+
+            <!-- Video Introductorio -->
+            <div class="module-card p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-play-circle text-pira-rodamina mr-2"></i>
+                    Video Introductorio: "Una empresa sancionada... y tú trabajas allí"
+                </h3>
+                <div class="video-placeholder mb-4">
+                    <div class="text-center">
+                        <i class="fas fa-video text-4xl mb-2"></i>
+                        <p class="text-sm">Video Animado - Duración: 1:30 min</p>
+                        <p class="text-xs mt-1">Historia de Ana y el impacto personal de las sanciones empresariales</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600 italic">
+                    "Una narración que conecta las consecuencias empresariales con la vida personal del trabajador,
+                    generando empatía y preocupación sobre la importancia del cumplimiento normativo."
+                </p>
+            </div>
+
+            <!-- Contenido Principal -->
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div class="module-card p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-info-circle text-pira-azul mr-2"></i>
+                        ¿Qué son LA/FT y Corrupción?
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-pira-azul">
+                            <h4 class="font-semibold text-pira-azul mb-2">Lavado de Activos (LA)</h4>
+                            <p class="text-sm text-gray-700">
+                                Es como el "lavado" de dinero sucio para que parezca limpio.
+                                Proceso mediante el cual se oculta el origen ilícito de recursos.
+                            </p>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg border-l-4 border-pira-verde">
+                            <h4 class="font-semibold text-pira-verde mb-2">Financiación del Terrorismo (FT)</h4>
+                            <p class="text-sm text-gray-700">
+                                Provisión o recolección de fondos para actividades terroristas,
+                                independientemente de su origen legal o ilegal.
+                            </p>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-pira-purpura">
+                            <h4 class="font-semibold text-pira-purpura mb-2">Corrupción</h4>
+                            <p class="text-sm text-gray-700">
+                                Usar tu poder para un beneficio injusto, como un "favorcito"
+                                a cambio de un negocio o ventaja indebida.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-card p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-user-shield text-pira-verde mr-2"></i>
+                        ¿Por qué me deben capacitar?
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-gavel text-pira-azul mt-1"></i>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Obligación Legal</h4>
+                                <p class="text-sm text-gray-600">Las empresas están obligadas por ley a capacitar a sus empleados.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-shield-alt text-pira-verde mt-1"></i>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Protección Personal</h4>
+                                <p class="text-sm text-gray-600">Tu conocimiento protege tu empleo y reputación.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-cogs text-pira-purpura mt-1"></i>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Engranaje Vital</h4>
+                                <p class="text-sm text-gray-600">Cada empleado es una pieza vital para el funcionamiento del sistema empresarial.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Casos Reales -->
+            <div class="module-card p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-newspaper text-pira-rodamina mr-2"></i>
+                    Casos Reales en Colombia: ¿Qué pasa si mi empresa no cumple?
+                </h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-building text-red-500 text-2xl"></i>
+                        </div>
+                        <h4 class="font-semibold text-red-700 mb-2">Empresa Constructora XYZ</h4>
+                        <p class="text-sm text-gray-700 mb-2">Multa: $2.500 millones</p>
+                        <p class="text-xs text-gray-600">Por no implementar SAGRILAFT. Pérdida de contratos públicos y 150 empleos.</p>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-store text-red-500 text-2xl"></i>
+                        </div>
+                        <h4 class="font-semibold text-red-700 mb-2">Comercializadora ABC</h4>
+                        <p class="text-sm text-gray-700 mb-2">Sanción: Inhabilitación 5 años</p>
+                        <p class="text-xs text-gray-600">Falta de controles en proveedores. Cierre de operaciones y 80 despidos.</p>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-handshake text-red-500 text-2xl"></i>
+                        </div>
+                        <h4 class="font-semibold text-red-700 mb-2">Consultoría DEF</h4>
+                        <p class="text-sm text-gray-700 mb-2">Pérdida reputacional</p>
+                        <p class="text-xs text-gray-600">Casos de corrupción. Pérdida del 60% de clientes y reducción de personal.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actividad Interactiva -->
+            <div class="activity-card p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-question-circle text-pira-verde mr-2"></i>
+                    Actividad: Verdadero o Falso - Mitos Comunes
+                </h3>
+                <div id="activity1" class="space-y-4">
+                    <!-- Las preguntas se generarán dinámicamente -->
+                </div>
+                <div id="activity1Results" class="hidden mt-4 p-4 bg-gray-50 rounded-lg">
+                    <h4 class="font-semibold text-gray-800 mb-2">Resultados:</h4>
+                    <div id="activity1Score" class="text-lg font-bold text-pira-azul"></div>
+                </div>
+            </div>
+
+            <!-- Refuerzo Motivacional -->
+            <div class="bg-gradient-to-r from-pira-azul to-pira-verde p-6 rounded-lg text-white text-center">
+                <i class="fas fa-shield-alt text-4xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Tu conocimiento protege tu empleo y tu reputación</h3>
+                <p class="text-sm opacity-90">
+                    Como un escudo que crece más fuerte con cada aprendizaje,
+                    tu preparación es la mejor defensa contra los riesgos.
+                </p>
+            </div>
+
+            <!-- Navigation -->
+            <div class="flex justify-between mt-8">
+                <button class="btn-pira bg-gray-300 text-gray-700 cursor-not-allowed" disabled>
+                    <i class="fas fa-chevron-left mr-2"></i>Anterior
+                </button>
+                <button id="nextModule1" class="btn-pira pira-azul text-white">
+                    Siguiente<i class="fas fa-chevron-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Module 2: SAGRILAFT para no expertos -->
+        <div id="module2" class="module-content hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">
+                    <i class="fas fa-shield-alt text-pira-azul mr-3"></i>
+                    Módulo 2: SAGRILAFT para no expertos
+                </h2>
+                <p class="text-lg text-gray-600">Comprender los conceptos clave del sistema SAGRILAFT de forma sencilla.</p>
+            </div>
+
+            <!-- Gancho Inicial -->
+            <div class="bg-gradient-to-r from-pira-rodamina to-pira-purpura p-8 rounded-lg text-white text-center mb-8">
+                <i class="fas fa-signature text-4xl mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">¿Sabías que tu firma puede ser investigada por los actos de un cliente?</h3>
+                <p class="text-lg opacity-90">Tu responsabilidad va más allá de lo que imaginas</p>
+            </div>
+
+            <!-- Contenido Principal -->
+            <div class="space-y-8">
+                <!-- ¿Qué significa SAGRILAFT? -->
+                <div class="module-card p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-info-circle text-pira-azul mr-2"></i>
+                        ¿Qué significa SAGRILAFT?
+                    </h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                                <h4 class="font-bold text-pira-azul text-lg mb-2">S.A.G.R.I.L.A.F.T</h4>
+                                <ul class="text-sm space-y-1">
+                                    <li><strong>S</strong>istema de</li>
+                                    <li><strong>A</strong>utocontrol y</li>
+                                    <li><strong>G</strong>estión del</li>
+                                    <li><strong>R</strong>iesgo</li>
+                                    <li><strong>I</strong>ntegral de</li>
+                                    <li><strong>L</strong>avado de</li>
+                                    <li><strong>A</strong>ctivos y</li>
+                                    <li><strong>F</strong>inanciación del</li>
+                                    <li><strong>T</strong>errorismo</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-center">
+                            <div class="text-center">
+                                <i class="fas fa-shield-alt text-6xl text-pira-azul mb-4"></i>
+                                <h4 class="font-semibold text-gray-800 mb-2">Sistema de Alarma y Protección</h4>
+                                <p class="text-sm text-gray-600">Protege a las empresas de ser utilizadas para actividades ilícitas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ¿Quién lo exige y por qué? -->
+                <div class="module-card p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-university text-pira-verde mr-2"></i>
+                        ¿Quién lo exige y por qué?
+                    </h3>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="text-center p-4 bg-green-50 rounded-lg">
+                            <i class="fas fa-gavel text-3xl text-pira-verde mb-3"></i>
+                            <h4 class="font-semibold text-gray-800 mb-2">Supersociedades</h4>
+                            <p class="text-sm text-gray-600">Principal supervisor del cumplimiento normativo</p>
+                        </div>
+                        <div class="text-center p-4 bg-green-50 rounded-lg">
+                            <i class="fas fa-landmark text-3xl text-pira-verde mb-3"></i>
+                            <h4 class="font-semibold text-gray-800 mb-2">UIAF</h4>
+                            <p class="text-sm text-gray-600">Unidad de Información y Análisis Financiero</p>
+                        </div>
+                        <div class="text-center p-4 bg-green-50 rounded-lg">
+                            <i class="fas fa-balance-scale text-3xl text-pira-verde mb-3"></i>
+                            <h4 class="font-semibold text-gray-800 mb-2">Otras Autoridades</h4>
+                            <p class="text-sm text-gray-600">Según el sector económico de la empresa</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <p class="text-sm text-gray-700">
+                            <strong>¿Por qué?</strong> Para proteger la economía nacional y evitar que las empresas
+                            sean utilizadas como instrumentos para el lavado de activos y financiación del terrorismo.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ¿A quién vigila la SuperSociedades? -->
+                <div class="module-card p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-search text-pira-purpura mr-2"></i>
+                        ¿A quién vigila la SuperSociedades?
+                    </h3>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                            <i class="fas fa-building text-pira-purpura text-2xl mb-2"></i>
+                            <h4 class="font-semibold text-gray-800 mb-2">Empresas de Construcción</h4>
+                            <p class="text-xs text-gray-600">Con ventas superiores a cierto monto</p>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                            <i class="fas fa-home text-pira-purpura text-2xl mb-2"></i>
+                            <h4 class="font-semibold text-gray-800 mb-2">Agencias Inmobiliarias</h4>
+                            <p class="text-xs text-gray-600">Intermediación en bienes raíces</p>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                            <i class="fas fa-car text-pira-purpura text-2xl mb-2"></i>
+                            <h4 class="font-semibold text-gray-800 mb-2">Concesionarios</h4>
+                            <p class="text-xs text-gray-600">Venta de vehículos nuevos y usados</p>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                            <i class="fas fa-gem text-pira-purpura text-2xl mb-2"></i>
+                            <h4 class="font-semibold text-gray-800 mb-2">Comercio de Joyas</h4>
+                            <p class="text-xs text-gray-600">Metales preciosos y piedras</p>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                            <i class="fas fa-briefcase text-pira-purpura text-2xl mb-2"></i>
+                            <h4 class="font-semibold text-gray-800 mb-2">Empresas de Servicios</h4>
+                            <p class="text-xs text-gray-600">Según monto de facturación anual</p>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                            <i class="fas fa-ellipsis-h text-pira-purpura text-2xl mb-2"></i>
+                            <h4 class="font-semibold text-gray-800 mb-2">Otras</h4>
+                            <p class="text-xs text-gray-600">Según criterios normativos específicos</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video Ejemplo -->
+                <div class="module-card p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-play-circle text-pira-rodamina mr-2"></i>
+                        Ejemplo Práctico: "Un pequeño empresario involucrado sin saberlo"
+                    </h3>
+                    <div class="video-placeholder mb-4">
+                        <div class="text-center">
+                            <i class="fas fa-video text-4xl mb-2"></i>
+                            <p class="text-sm">Video Animado - Duración: 1:30 min</p>
+                            <p class="text-xs mt-1">Caso de un dueño de ferretería que sin malas intenciones se involucra en una red</p>
+                        </div>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
+                        <h4 class="font-semibold text-yellow-800 mb-2">Puntos de Reflexión:</h4>
+                        <ul class="text-sm text-gray-700 space-y-1">
+                            <li>• ¿Cómo el desconocimiento puede llevar a consecuencias graves?</li>
+                            <li>• ¿Qué señales de alerta debió identificar?</li>
+                            <li>• ¿Cómo pudo haberse prevenido la situación?</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Tu rol aunque no seas experto -->
+                <div class="module-card p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-puzzle-piece text-pira-azul mr-2"></i>
+                        ¿Qué debo saber aunque no sea abogado ni contador?
+                    </h3>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="text-center p-4">
+                            <i class="fas fa-eye text-3xl text-pira-azul mb-3"></i>
+                            <h4 class="font-semibold text-gray-800 mb-2">Identificar</h4>
+                            <p class="text-sm text-gray-600">Reconocer señales de alerta en clientes y transacciones</p>
+                        </div>
+                        <div class="text-center p-4">
+                            <i class="fas fa-flag text-3xl text-pira-verde mb-3"></i>
+                            <h4 class="font-semibold text-gray-800 mb-2">Reportar</h4>
+                            <p class="text-sm text-gray-600">Informar situaciones sospechosas por los canales adecuados</p>
+                        </div>
+                        <div class="text-center p-4">
+                            <i class="fas fa-book text-3xl text-pira-purpura mb-3"></i>
+                            <h4 class="font-semibold text-gray-800 mb-2">Conocer</h4>
+                            <p class="text-sm text-gray-600">Familiarizarse con las políticas internas de la empresa</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-4 bg-blue-50 rounded-lg text-center">
+                        <i class="fas fa-puzzle-piece text-2xl text-pira-azul mb-2"></i>
+                        <p class="text-sm text-gray-700">
+                            <strong>Eres una pieza esencial del puzzle.</strong>
+                            Cada empleado contribuye a completar la imagen de cumplimiento empresarial.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actividad -->
+            <div class="activity-card p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-edit text-pira-verde mr-2"></i>
+                    Actividad: Completa la Frase con Sentido
+                </h3>
+                <div id="activity2" class="space-y-4">
+                    <!-- Las preguntas se generarán dinámicamente -->
+                </div>
+                <div id="activity2Results" class="hidden mt-4 p-4 bg-gray-50 rounded-lg">
+                    <h4 class="font-semibold text-gray-800 mb-2">Resultados:</h4>
+                    <div id="activity2Score" class="text-lg font-bold text-pira-azul"></div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="flex justify-between mt-8">
+                <button id="prevModule2" class="btn-pira bg-gray-500 text-white">
+                    <i class="fas fa-chevron-left mr-2"></i>Anterior
+                </button>
+                <button id="nextModule2" class="btn-pira pira-azul text-white">
+                    Siguiente<i class="fas fa-chevron-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Module 3: El mundo real de la corrupción y el PTEE -->
+        <div id="module3" class="module-content hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">
+                    <i class="fas fa-balance-scale text-pira-azul mr-3"></i>
+                    Módulo 3: El mundo real de la corrupción y el PTEE
+                </h2>
+                <p class="text-lg text-gray-600">Explicar cómo la corrupción puede estar en el día a día empresarial y qué hacer para prevenirla.</p>
+            </div>
+
+            <!-- Video Historia Animada -->
+            <div class="module-card p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-play-circle text-pira-rodamina mr-2"></i>
+                    Historia: "Un proveedor ofrece un 'favorcito' al área de compras"
+                </h3>
+                <div class="video-placeholder mb-4">
+                    <div class="text-center">
+                        <i class="fas fa-video text-4xl mb-2"></i>
+                        <p class="text-sm">Video Animado - Duración: 1:30 min</p>
+                        <p class="text-xs mt-1">El dilema ético de un empleado ante una propuesta de corrupción</p>
+                    </div>
+                </div>
+                <div class="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-400">
+                    <h4 class="font-semibold text-orange-800 mb-2">Reflexiona:</h4>
+                    <p class="text-sm text-gray-700">
+                        ¿Qué harías en el lugar del empleado? ¿Cuáles son las consecuencias de cada decisión?
+                        La narrativa muestra tanto la tentación como la claridad de la decisión correcta.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Contenido Principal -->
+            <div class="space-y-8">
+                <!-- ¿Qué es el PTEE? -->
+                <div class="module-card p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-shield-alt text-pira-verde mr-2"></i>
+                        ¿Qué es el PTEE y por qué ahora es obligatorio?
+                    </h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <div class="bg-green-50 p-4 rounded-lg mb-4">
+                                <h4 class="font-bold text-pira-verde text-lg mb-2">P.T.E.E</h4>
+                                <ul class="text-sm space-y-1">
+                                    <li><strong>P</strong>rograma de</li>
+                                    <li><strong>T</strong>ransparencia y</li>
+                                    <li><strong>E</strong>tica</li>
+                                    <li><strong>E</strong>mpresarial</li>
+                                </ul>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h4 class="font-semibold text-pira-azul mb-2">Ley 2195 de 2022</h4>
+                                <p class="text-sm text-gray-700">
+                                    Refuerza la obligatoriedad del PTEE para empresas que contraten con el Estado.
+                                    Establece requisitos más estrictos de transparencia.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-center">
+                            <div class="text-center">
+                                <i class="fas fa-shield-alt text-6xl text-pira-verde mb-4"></i>
+                                <h4 class="font-semibold text-gray-800 mb-2">Escudo Anticorrupción</h4>
+                                <p class="text-sm text-gray-600">
+                                    Sistema integral para prevenir, detectar y responder
+                                    ante actos de corrupción en las organizaciones.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Diferencias Conceptuales -->
+                <div class="module-card p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-sitemap text-pira-purpura mr-2"></i>
+                        Diferencia entre Soborno, Conflicto de Interés y Corrupción
+                    </h3>
+                    <div class="grid lg:grid-cols-3 gap-6">
+                        <div class="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
+                            <div class="flex items-center mb-3">
+                                <i class="fas fa-money-bill-wave text-red-500 text-2xl mr-3"></i>
+                                <h4 class="font-bold text-red-700">Soborno</h4>
+                            </div>
+                            <p class="text-sm text-gray-700 mb-3">
+                                <strong>Definición:</strong> Ofrecer, dar, recibir o solicitar algo de valor
+                                para influir en una decisión.
+                            </p>
+                            <div class="bg-white p-3 rounded border">
+                                <p class="text-xs text-gray-600">
+                                    <strong>Ejemplo:</strong> Un proveedor regala un iPhone al jefe de compras
+                                    para ganar un contrato.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
+                            <div class="flex items-center mb-3">
+                                <i class="fas fa-balance-scale-right text-yellow-600 text-2xl mr-3"></i>
+                                <h4 class="font-bold text-yellow-700">Conflicto de Interés</h4>
+                            </div>
+                            <p class="text-sm text-gray-700 mb-3">
+                                <strong>Definición:</strong> Situación donde los intereses personales
+                                pueden influir en decisiones profesionales.
+                            </p>
+                            <div class="bg-white p-3 rounded border">
+                                <p class="text-xs text-gray-600">
+                                    <strong>Ejemplo:</strong> El gerente de compras es hermano del dueño
+                                    de un proveedor principal.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+                            <div class="flex items-center mb-3">
+                                <i class="fas fa-user-times text-purple-500 text-2xl mr-3"></i>
+                                <h4 class="font-bold text-purple-700">Corrupción</h4>
+                            </div>
+                            <p class="text-sm text-gray-700 mb-3">
+                                <strong>Definición:</strong> Abuso de poder para obtener beneficios privados
+                                de manera deshonesta.
+                            </p>
+                            <div class="bg-white p-3 rounded border">
+                                <p class="text-xs text-gray-600">
+                                    <strong>Ejemplo:</strong> Un funcionario acelera trámites a cambio
+                                    de pagos adicionales no oficiales.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                            <h4 class="font-semibold text-gray-800">Clave para recordar:</h4>
+                        </div>
+                        <p class="text-sm text-gray-700">
+                            Un conflicto de interés gestionado correctamente no es corrupción.
+                            La diferencia está en la transparencia y el manejo ético de la situación.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ¿Cómo responde una empresa ética? -->
+                <div class="module-card p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-heart text-pira-azul mr-2"></i>
+                        ¿Cómo responde una empresa ética?
+                    </h3>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-scroll text-2xl text-pira-azul"></i>
+                            </div>
+                            <h4 class="font-semibold text-gray-800 mb-2">Código de Conducta</h4>
+                            <p class="text-sm text-gray-600">
+                                Normas claras sobre comportamiento ético y profesional
+                                que guían las decisiones diarias.
+                            </p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-phone text-2xl text-pira-verde"></i>
+                            </div>
+                            <h4 class="font-semibold text-gray-800 mb-2">Canales de Denuncia</h4>
+                            <p class="text-sm text-gray-600">
+                                Líneas seguras y confidenciales para reportar
+                                irregularidades sin temor a represalias.
+                            </p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-graduation-cap text-2xl text-pira-purpura"></i>
+                            </div>
+                            <h4 class="font-semibold text-gray-800 mb-2">Capacitaciones</h4>
+                            <p class="text-sm text-gray-600">
+                                Formación continua para mantener actualizados
+                                a todos los colaboradores en temas éticos.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center">
+                        <div class="inline-block bg-gradient-to-r from-pira-azul to-pira-verde text-white px-6 py-3 rounded-lg">
+                            <i class="fas fa-heart mr-2"></i>
+                            <span class="font-semibold">BASE: INTEGRIDAD</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">
+                            La integridad es el fundamento sobre el cual se construye toda empresa ética
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actividad: Dilemas Éticos -->
+            <div class="activity-card p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-crossroads text-pira-verde mr-2"></i>
+                    Actividad: Toma una Decisión - Dilemas Éticos
+                </h3>
+                <div id="activity3" class="space-y-6">
+                    <!-- Los dilemas se generarán dinámicamente -->
+                </div>
+                <div id="activity3Results" class="hidden mt-4 p-4 bg-gray-50 rounded-lg">
+                    <h4 class="font-semibold text-gray-800 mb-2">Resultados:</h4>
+                    <div id="activity3Score" class="text-lg font-bold text-pira-azul"></div>
+                </div>
+            </div>
+
+            <!-- Refuerzo Emocional -->
+            <div class="bg-gradient-to-r from-pira-purpura to-pira-rodamina p-6 rounded-lg text-white text-center">
+                <i class="fas fa-compass text-4xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">"Ser ético es elegir lo correcto aunque nadie mire"</h3>
+                <p class="text-sm opacity-90">
+                    Como un faro en la oscuridad o una brújula que siempre apunta al norte,
+                    la ética nos guía hacia las decisiones correctas en toda circunstancia.
+                </p>
+            </div>
+
+            <!-- Navigation -->
+            <div class="flex justify-between mt-8">
+                <button id="prevModule3" class="btn-pira bg-gray-500 text-white">
+                    <i class="fas fa-chevron-left mr-2"></i>Anterior
+                </button>
+                <button id="nextModule3" class="btn-pira pira-azul text-white">
+                    Siguiente<i class="fas fa-chevron-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Module 4: ¿Y ahora qué hago yo? -->
+        <div id="module4" class="module-content hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">
+                    <i class="fas fa-tasks text-pira-azul mr-3"></i>
+                    Módulo 4: ¿Y ahora qué hago yo?
+                </h2>
+                <p class="text-lg text-gray-600">Mostrar de forma práctica cómo actuar según el rol del colaborador.</p>
+            </div>
+
+            <!-- Video Gancho -->
+            <div class="module-card p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-play-circle text-pira-rodamina mr-2"></i>
+                    "¿A quién debes reportar una sospecha? ¿Y cómo evitar errores comunes?"
+                </h3>
+                <div class="video-placeholder mb-4">
+                    <div class="text-center">
+                        <i class="fas fa-video text-4xl mb-2"></i>
+                        <p class="text-sm">Video Animado - Duración: 1:30 min</p>
+                        <p class="text-xs mt-1">Ruta correcta de reporte y errores comunes a evitar</p>
+                    </div>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-pira-azul">
+                    <h4 class="font-semibold text-pira-azul mb-2">Puntos Clave del Video:</h4>
+                    <ul class="text-sm text-gray-700 space-y-1">
+                        <li>• Identificación de diferentes tipos de sospechas</li>
+                        <li>• Ruta correcta para el reporte</li>
+                        <li>• Errores comunes y cómo evitarlos</li>
+                        <li>• Importancia de la confidencialidad</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Contenido Principal -->
+            <div class="space-y-8">
+                <!-- Tipos de Alertas y Reportes -->
+                <div class="module-card p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-traffic-light text-pira-verde mr-2"></i>
+                        Tipos de Alertas y Reportes
+                    </h3>
+                    <div class="mb-6">
+                        <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400 mb-4">
+                            <h4 class="font-semibold text-yellow-800 mb-2">¿Qué es una Alerta?</h4>
+                            <p class="text-sm text-gray-700">
+                                Una alerta es un <strong>indicio</strong>, no una certeza. Es una situación que llama
+                                la atención porque se sale de lo normal o presenta características sospechosas.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <!-- Nivel Verde -->
+                        <div class="bg-green-50 p-4 rounded-lg border-2 border-green-200">
+                            <div class="flex items-center mb-3">
+                                <div class="w-4 h-4 bg-green-500 rounded-full mr-3"></div>
+                                <h4 class="font-bold text-green-700">NIVEL VERDE</h4>
+                            </div>
+                            <p class="text-sm text-gray-700 mb-2"><strong>Situaciones de bajo riesgo</strong></p>
+                            <ul class="text-xs text-gray-600 space-y-1">
+                                <li>• Documentación incompleta menor</li>
+                                <li>• Cambios menores en información</li>
+                                <li>• Consultas sobre procedimientos</li>
+                            </ul>
+                            <div class="mt-3 text-xs text-green-700 font-semibold">
+                                Acción: Documentar y continuar seguimiento
+                            </div>
+                        </div>
+
+                        <!-- Nivel Amarillo -->
+                        <div class="bg-yellow-50 p-4 rounded-lg border-2 border-yellow-200">
+                            <div class="flex items-center mb-3">
+                                <div class="w-4 h-4 bg-yellow-500 rounded-full mr-3"></div>
+                                <h4 class="font-bold text-yellow-700">NIVEL AMARILLO</h4>
+                            </div>
+                            <p class="text-sm text-gray-700 mb-2"><strong>Situaciones que requieren atención</strong></p>
+                            <ul class="text-xs text-gray-600 space-y-1">
+                                <li>• Transacciones inusuales</li>
+                                <li>• Comportamientos atípicos</li>
+                                <li>• Información contradictoria</li>
+                            </ul>
+                            <div class="mt-3 text-xs text-yellow-700 font-semibold">
+                                Acción: Reportar al supervisor inmediato
+                            </div>
+                        </div>
+
+                        <!-- Nivel Rojo -->
+                        <div class="bg-red-50 p-4 rounded-lg border-2 border-red-200">
+                            <div class="flex items-center mb-3">
+                                <div class="w-4 h-4 bg-red-500 rounded-full mr-3"></div>
+                                <h4 class="font-bold text-red-700">NIVEL ROJO</h4>
+                            </div>
+                            <p class="text-sm text-gray-700 mb-2"><strong>Situaciones de alto riesgo</strong></p>
+                            <ul class="text-xs text-gray-600 space-y-1">
+                                <li>• Actividades claramente sospechosas</li>
+                                <li>• Posible fraude o corrupción</li>
+                                <li>• Violaciones éticas graves</li>
+                            </ul>
+                            <div class="mt-3 text-xs text-red-700 font-semibold">
+                                Acción: Reportar inmediatamente al Oficial de Cumplimiento
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Debida Diligencia y Señales de Alerta -->
+                <div class="module-card p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-search text-pira-azul mr-2"></i>
+                        ¿Qué es la Debida Diligencia? ¿Cómo reconocer señales de alerta?
+                    </h3>
+
+                    <div class="bg-blue-50 p-4 rounded-lg mb-6 border-l-4 border-pira-azul">
+                        <h4 class="font-semibold text-pira-azul mb-2">Debida Diligencia = "Conocer a nuestras contrapartes"</h4>
+                        <p class="text-sm text-gray-700">
+                            Es el proceso de investigar y verificar la información sobre clientes, proveedores y socios
+                            para asegurar que son legítimos y no representan riesgos para la empresa.
+                        </p>
+                    </div>
+
+                    <div class="grid lg:grid-cols-3 gap-6">
+                        <!-- Señales en Clientes -->
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3 flex items-center">
+                                <i class="fas fa-users text-pira-verde mr-2"></i>
+                                Señales en Clientes
+                            </h4>
+                            <div class="space-y-2">
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-red-600">⚠️ Pagos en efectivo inusualmente grandes</p>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-red-600">⚠️ Reticencia a proporcionar información</p>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-red-600">⚠️ Direcciones falsas o apartados postales</p>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-red-600">⚠️ Actividad económica no clara</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Señales en Proveedores -->
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3 flex items-center">
+                                <i class="fas fa-truck text-pira-purpura mr-2"></i>
+                                Señales en Proveedores
+                            </h4>
+                            <div class="space-y-2">
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-red-600">⚠️ Cambios frecuentes de dueños</p>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-red-600">⚠️ Precios muy por debajo del mercado</p>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-red-600">⚠️ Presión para acelerar procesos</p>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-red-600">⚠️ Solicitud de pagos a terceros</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Señales en Transacciones -->
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3 flex items-center">
+                                <i class="fas fa-exchange-alt text-pira-rodamina mr-2"></i>
+                                Señales en Transacciones
+                            </h4>
+                            <div class="space-y-2">
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-red-600">⚠️ Montos redondos inusuales</p>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-red-600">⚠️ Múltiples transacciones pequeñas</p>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-red-600">⚠️ Urgencia injustificada</p>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-red-600">⚠️ Operaciones complejas sin razón aparente</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Canales de Denuncia -->
+                <div class="module-card p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-shield-alt text-pira-verde mr-2"></i>
+                        Canales de Denuncia: Sí sirven, sí protegen
+                    </h3>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3 flex items-center">
+                                <i class="fas fa-phone text-pira-azul mr-2"></i>
+                                Canales Disponibles
+                            </h4>
+                            <div class="space-y-3">
+                                <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                    <div class="flex items-center mb-2">
+                                        <i class="fas fa-phone text-pira-azul mr-2"></i>
+                                        <strong class="text-gray-800">Línea Ética</strong>
+                                    </div>
+                                    <p class="text-sm text-gray-600">Disponible 24/7, confidencial y anónima</p>
+                                </div>
+
+                                <div class="bg-green-50 p-3 rounded-lg border border-green-200">
+                                    <div class="flex items-center mb-2">
+                                        <i class="fas fa-envelope text-pira-verde mr-2"></i>
+                                        <strong class="text-gray-800">Correo del Oficial de Cumplimiento</strong>
+                                    </div>
+                                    <p class="text-sm text-gray-600">Comunicación directa y protegida</p>
+                                </div>
+
+                                <div class="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                    <div class="flex items-center mb-2">
+                                        <i class="fas fa-globe text-pira-purpura mr-2"></i>
+                                        <strong class="text-gray-800">Portal Web Interno</strong>
+                                    </div>
+                                    <p class="text-sm text-gray-600">Plataforma segura para reportes escritos</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3 flex items-center">
+                                <i class="fas fa-lock text-pira-verde mr-2"></i>
+                                Tu Protección Está Garantizada
+                            </h4>
+                            <div class="space-y-3">
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-user-secret text-pira-azul mt-1"></i>
+                                    <div>
+                                        <h5 class="font-semibold text-gray-800">Confidencialidad</h5>
+                                        <p class="text-sm text-gray-600">Tu identidad está protegida por ley</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-shield-alt text-pira-verde mt-1"></i>
+                                    <div>
+                                        <h5 class="font-semibold text-gray-800">No Represalias</h5>
+                                        <p class="text-sm text-gray-600">Protección legal contra cualquier retaliación</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-handshake text-pira-purpura mt-1"></i>
+                                    <div>
+                                        <h5 class="font-semibold text-gray-800">Apoyo Continuo</h5>
+                                        <p class="text-sm text-gray-600">Acompañamiento durante todo el proceso</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Disipar Mitos -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-gray-800 mb-3 flex items-center">
+                            <i class="fas fa-times-circle text-red-500 mr-2"></i>
+                            Disipar Mitos Comunes
+                        </h4>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-red-600 mb-1">❌ <strong>MITO:</strong> "Me van a despedir por reportar"</p>
+                                <p class="text-sm text-green-600">✅ <strong>REALIDAD:</strong> Está prohibido por ley despedir por denunciar</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-red-600 mb-1">❌ <strong>MITO:</strong> "Nadie va a hacer nada"</p>
+                                <p class="text-sm text-green-600">✅ <strong>REALIDAD:</strong> Todas las denuncias se investigan</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Material Descargable -->
+                <div class="module-card p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-download text-pira-azul mr-2"></i>
+                        Guía Rápida de Actuación - Material Descargable
+                    </h3>
+
+                    <div class="bg-blue-50 p-6 rounded-lg border-2 border-dashed border-pira-azul">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-file-pdf text-4xl text-red-500 mb-2"></i>
+                            <h4 class="font-bold text-gray-800">Guía Rápida: "Qué Hacer Si Sospechas Algo"</h4>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <h5 class="font-semibold text-gray-800 mb-2">Contenido de la Guía:</h5>
+                                <ul class="text-sm text-gray-600 space-y-1">
+                                    <li>• Flujograma de actuación paso a paso</li>
+                                    <li>• Lista de contactos clave</li>
+                                    <li>• Señales de alerta más comunes</li>
+                                    <li>• Formatos de reporte</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 class="font-semibold text-gray-800 mb-2">Información de Contacto:</h5>
+                                <div class="text-sm text-gray-600 space-y-1">
+                                    <p><strong>Oficial de Cumplimiento:</strong> [Nombre]</p>
+                                    <p><strong>Línea Ética:</strong> [Teléfono]</p>
+                                    <p><strong>Email:</strong> etica@empresa.com</p>
+                                    <p><strong>Portal:</strong> www.empresa.com/reportes</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button id="downloadGuide" class="btn-pira pira-azul text-white">
+                                <i class="fas fa-download mr-2"></i>
+                                Descargar Guía PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actividad: Marca el Riesgo -->
+            <div class="activity-card p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-exclamation-triangle text-pira-verde mr-2"></i>
+                    Actividad: Marca el Riesgo
+                </h3>
+                <p class="text-gray-600 mb-4">
+                    Revisa cada situación y marca si representa un posible riesgo de LA/FT o corrupción:
+                </p>
+                <div id="activity4" class="space-y-3">
+                    <!-- Las situaciones se generarán dinámicamente -->
+                </div>
+                <div id="activity4Results" class="hidden mt-4 p-4 bg-gray-50 rounded-lg">
+                    <h4 class="font-semibold text-gray-800 mb-2">Resultados:</h4>
+                    <div id="activity4Score" class="text-lg font-bold text-pira-azul"></div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="flex justify-between mt-8">
+                <button id="prevModule4" class="btn-pira bg-gray-500 text-white">
+                    <i class="fas fa-chevron-left mr-2"></i>Anterior
+                </button>
+                <button id="nextModule4" class="btn-pira pira-azul text-white">
+                    Siguiente<i class="fas fa-chevron-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Module 5: Tu rol, tu huella -->
+        <div id="module5" class="module-content hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">
+                    <i class="fas fa-certificate text-pira-azul mr-3"></i>
+                    Módulo 5: Tu rol, tu huella
+                </h2>
+                <p class="text-lg text-gray-600">Cerrar con alto impacto motivacional e integración de lo aprendido.</p>
+            </div>
+
+            <!-- Video Emocional Final -->
+            <div class="module-card p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-play-circle text-pira-rodamina mr-2"></i>
+                    Video Final: "Lo que haces cada día... construye o destruye reputación"
+                </h3>
+                <div class="video-placeholder mb-4">
+                    <div class="text-center">
+                        <i class="fas fa-video text-4xl mb-2"></i>
+                        <p class="text-sm">Video Motivacional - Duración: 1:30 min</p>
+                        <p class="text-xs mt-1">De la crisis a la construcción: cómo las acciones diarias forjan el futuro</p>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-gray-600 to-pira-azul p-4 rounded-lg text-white">
+                    <h4 class="font-semibold mb-2 flex items-center">
+                        <i class="fas fa-film mr-2"></i>
+                        Narrativa del Video:
+                    </h4>
+                    <p class="text-sm opacity-90">
+                        Inicia en tonos sepia mostrando las consecuencias de la falta de ética,
+                        luego transiciona a colores vibrantes donde cada colaborador, con sus decisiones éticas diarias,
+                        construye la reputación empresarial ladrillo a ladrillo hasta formar un edificio sólido.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Autodiagnóstico Ético -->
+            <div class="module-card p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-mirror text-pira-purpura mr-2"></i>
+                    Autodiagnóstico Ético Personal (Anónimo)
+                </h3>
+
+                <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-pira-purpura mb-6">
+                    <p class="text-sm text-gray-700">
+                        <i class="fas fa-user-secret mr-2 text-pira-purpura"></i>
+                        Este cuestionario es completamente anónimo y personal. Los resultados son solo para tu reflexión
+                        individual, no se guardan ni se califican. Su propósito es fomentar la introspección
+                        y el compromiso personal.
+                    </p>
+                </div>
+
+                <div id="autodiagnosis" class="space-y-6">
+                    <!-- Las preguntas se generarán dinámicamente -->
+                </div>
+
+                <div id="autodiagnosisResults" class="hidden mt-6 p-6 bg-gray-50 rounded-lg">
+                    <h4 class="font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                        Tu Reflexión Personal
+                    </h4>
+                    <div id="autodiagnosisInsight" class="text-gray-700"></div>
+                </div>
+            </div>
+
+            <!-- Compromiso Individual y Reputación -->
+            <div class="module-card p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-handshake text-pira-verde mr-2"></i>
+                    Compromiso Individual y Reputación Organizacional
+                </h3>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <div class="text-center mb-6">
+                            <i class="fas fa-mirror text-6xl text-pira-azul mb-4"></i>
+                            <h4 class="font-semibold text-gray-800 mb-2">El Espejo de la Responsabilidad</h4>
+                            <p class="text-sm text-gray-600">
+                                Tu acción individual se refleja directamente en la imagen de la organización.
+                                Cada decisión cuenta, cada comportamiento importa.
+                            </p>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="bg-blue-50 p-3 rounded-lg border-l-3 border-pira-azul">
+                                <h5 class="font-semibold text-pira-azul">Tu Integridad = Reputación Empresarial</h5>
+                            </div>
+                            <div class="bg-green-50 p-3 rounded-lg border-l-3 border-pira-verde">
+                                <h5 class="font-semibold text-pira-verde">Tus Decisiones = Sostenibilidad del Negocio</h5>
+                            </div>
+                            <div class="bg-purple-50 p-3 rounded-lg border-l-3 border-pira-purpura">
+                                <h5 class="font-semibold text-pira-purpura">Tu Compromiso = Futuro Colectivo</h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-4">Reflexiona sobre estos puntos:</h4>
+                        <div class="space-y-4">
+                            <div class="bg-white p-4 rounded-lg border border-gray-200">
+                                <h5 class="font-semibold text-gray-800 mb-2 flex items-center">
+                                    <i class="fas fa-question-circle text-pira-azul mr-2"></i>
+                                    ¿Qué aprendiste?
+                                </h5>
+                                <p class="text-sm text-gray-600">
+                                    Identifica los tres conceptos más importantes que te llevas de este curso.
+                                </p>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-lg border border-gray-200">
+                                <h5 class="font-semibold text-gray-800 mb-2 flex items-center">
+                                    <i class="fas fa-forward text-pira-verde mr-2"></i>
+                                    ¿Qué harás distinto mañana?
+                                </h5>
+                                <p class="text-sm text-gray-600">
+                                    Piensa en acciones concretas que implementarás en tu día a día.
+                                </p>
+                            </div>
+
+                            <div class="bg-gradient-to-r from-pira-azul to-pira-verde p-4 rounded-lg text-white">
+                                <h5 class="font-semibold mb-2 flex items-center">
+                                    <i class="fas fa-quote-left mr-2"></i>
+                                    Frase Inspiradora
+                                </h5>
+                                <p class="text-sm italic">
+                                    "La integridad no es lo que hacemos, sino lo que somos.
+                                    Y lo que somos, a su vez, determina lo que hacemos."
+                                    - John C. Maxwell
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reflexión Escrita Opcional -->
+            <div class="module-card p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-pen text-pira-azul mr-2"></i>
+                    Reflexión Personal (Opcional)
+                </h3>
+
+                <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                    <p class="text-sm text-gray-700">
+                        Si deseas, puedes compartir voluntariamente un aprendizaje clave o un compromiso personal
+                        que te lleves de este curso. Esta reflexión te ayudará a consolidar tu aprendizaje.
+                    </p>
+                </div>
+
+                <textarea
+                    id="personalReflection"
+                    class="w-full p-4 border border-gray-300 rounded-lg resize-none"
+                    rows="4"
+                    placeholder="Escribe tu reflexión aquí... (opcional y voluntario)"
+                ></textarea>
+
+                <div class="mt-3 text-right">
+                    <button id="saveReflection" class="btn-pira pira-verde text-white">
+                        <i class="fas fa-heart mr-2"></i>
+                        Guardar Reflexión
+                    </button>
+                </div>
+            </div>
+
+            <!-- Evaluación Final -->
+            <div class="activity-card p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-clipboard-check text-pira-rodamina mr-2"></i>
+                    Evaluación Final del Curso
+                </h3>
+
+                <div class="bg-red-50 p-4 rounded-lg border-l-4 border-pira-rodamina mb-6">
+                    <p class="text-sm text-gray-700">
+                        <strong>Esta es tu evaluación final.</strong> Debes responder correctamente al menos 80%
+                        de las preguntas para aprobar el curso y obtener tu certificación.
+                    </p>
+                </div>
+
+                <div id="finalExam" class="space-y-6">
+                    <!-- Las preguntas se generarán dinámicamente -->
+                </div>
+
+                <div class="mt-6 text-center">
+                    <button id="submitFinalExam" class="btn-pira pira-rodamina text-white text-lg px-8 py-3">
+                        <i class="fas fa-check-double mr-2"></i>
+                        Finalizar Evaluación
+                    </button>
+                </div>
+
+                <div id="examResults" class="hidden mt-6">
+                    <!-- Los resultados se mostrarán aquí -->
+                </div>
+            </div>
+
+            <!-- Certificación -->
+            <div id="certificationSection" class="hidden">
+                <div class="certificate-template">
+                    <div class="text-center mb-8">
+                        <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-pira-azul to-pira-verde rounded-full flex items-center justify-center">
+                            <i class="fas fa-certificate text-white text-3xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-pira-azul mb-2">¡FELICITACIONES!</h2>
+                        <p class="text-gray-600">Has completado exitosamente el curso</p>
+                    </div>
+
+                    <div class="border-4 border-double border-pira-azul p-8 mb-6">
+                        <div class="text-center">
+                            <h1 class="text-4xl font-bold text-pira-azul mb-6 acephimere-italic">CERTIFICADO</h1>
+                            <p class="text-lg text-gray-700 mb-4">Otorgado a:</p>
+                            <h2 id="certUserName" class="text-2xl font-bold text-gray-900 mb-6"></h2>
+                            <p class="text-gray-700 mb-4">Por haber completado satisfactoriamente el curso:</p>
+                            <h3 class="text-xl font-semibold text-pira-purpura mb-6">
+                                "PREVENCIÓN DE LAVADO DE ACTIVOS, FINANCIACIÓN DEL TERRORISMO Y CORRUPCIÓN"
+                            </h3>
+                            <div class="grid grid-cols-2 gap-4 text-sm text-gray-600 mb-6">
+                                <div>
+                                    <p><strong>Documento:</strong> <span id="certUserDoc"></span></p>
+                                    <p><strong>Fecha de Aprobación:</strong> <span id="certDate"></span></p>
+                                </div>
+                                <div>
+                                    <p><strong>Duración:</strong> 5 Módulos</p>
+                                    <p><strong>Calificación:</strong> <span id="certScore"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mb-6">
+                        <div class="text-sm text-gray-600 mb-4">
+                            <p><strong>PREVENCIÓN INTEGRAL DE RIESGO CON ANALÍTICA</strong></p>
+                            <p><strong>PIRA RIESGOS SAS</strong></p>
+                            <p>www.pira.com.co | contactenos@pira.com.co</p>
+                            <p>Carrera 82 Bis 54 – 30 Sur</p>
+                        </div>
+
+                        <button id="downloadCertificate" class="btn-pira pira-azul text-white mr-4">
+                            <i class="fas fa-download mr-2"></i>
+                            Descargar Certificado
+                        </button>
+
+                        <button id="emailCertificate" class="btn-pira pira-verde text-white">
+                            <i class="fas fa-envelope mr-2"></i>
+                            Enviar por Email
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="flex justify-between mt-8">
+                <button id="prevModule5" class="btn-pira bg-gray-500 text-white">
+                    <i class="fas fa-chevron-left mr-2"></i>Anterior
+                </button>
+                <button id="finishCourse" class="btn-pira pira-rodamina text-white hidden">
+                    <i class="fas fa-trophy mr-2"></i>¡Curso Completado!
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Floating Progress Indicator -->
+    <div class="floating-progress">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-chart-line text-pira-azul"></i>
+            <span class="text-sm font-medium text-gray-700">Módulo <span id="floatingCurrentModule">1</span>/5</span>
+        </div>
+    </div>
+
+</div>
+
+<!-- Contact Information Footer -->
+<footer class="bg-gray-800 text-white py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-4 gap-6">
+            <div>
+                <div class="flex items-center mb-4">
+                    <div class="w-10 h-10 bg-pira-azul rounded-lg flex items-center justify-center mr-3">
+                        <i class="fas fa-shield-alt text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg">PIRA RIESGOS SAS</h3>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-300">
+                    Prevención Integral de Riesgo con Analítica
+                </p>
+            </div>
+
+            <div>
+                <h4 class="font-semibold mb-3 text-pira-azul">Contacto</h4>
+                <div class="space-y-2 text-sm text-gray-300">
+                    <p><i class="fas fa-envelope mr-2 text-pira-verde"></i>contactenos@pira.com.co</p>
+                    <p><i class="fas fa-envelope mr-2 text-pira-verde"></i>luis.riano@pira.com.co</p>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="font-semibold mb-3 text-pira-azul">Teléfonos</h4>
+                <div class="space-y-2 text-sm text-gray-300">
+                    <p><i class="fas fa-phone mr-2 text-pira-verde"></i>313 374 6523</p>
+                    <p><i class="fas fa-phone mr-2 text-pira-verde"></i>301 199 6220</p>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="font-semibold mb-3 text-pira-azul">Dirección</h4>
+                <div class="space-y-2 text-sm text-gray-300">
+                    <p><i class="fas fa-map-marker-alt mr-2 text-pira-verde"></i>Carrera 82 Bis 54 – 30 Sur</p>
+                    <p><i class="fas fa-globe mr-2 text-pira-verde"></i>www.pira.com.co</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-700 mt-6 pt-6 text-center">
+            <p class="text-sm text-gray-400">
+                © 2024 PIRA RIESGOS SAS. Sistema de Gestión de Cursos LA/FT y PTEE.
+            </p>
+        </div>
+    </div>
+</footer>
+
+<script>
+// ===== GLOBAL VARIABLES =====
+let currentUser = null;
+let currentModule = 1;
+let courseProgress = 0;
+let moduleProgress = {1: false, 2: false, 3: false, 4: false, 5: false};
+let activityScores = {};
+
+// Simulated Google Sheets data structure
+let sheetsData = [];
+
+// Course activities data
+const activities = {
+    module1: {
+        questions: [
+            {
+                question: "Si es dinero en efectivo, no hay rastro para investigación",
+                correct: false,
+                explanation: "FALSO: El efectivo también puede dejar huellas y ser objeto de investigación a través de patrones de transacción y otros indicios."
+            },
+            {
+                question: "Solo las empresas grandes deben implementar SAGRILAFT",
+                correct: false,
+                explanation: "FALSO: La obligación depende del sector y monto de ventas, no solo del tamaño de la empresa."
+            },
+            {
+                question: "Los empleados no tienen responsabilidad en la prevención de LA/FT",
+                correct: false,
+                explanation: "FALSO: Todos los empleados tienen un rol vital en identificar señales de alerta y reportar situaciones sospechosas."
+            },
+            {
+                question: "Una empresa sancionada puede perder contratos y generar desempleo",
+                correct: true,
+                explanation: "VERDADERO: Las sanciones por incumplimiento pueden resultar en pérdida de contratos, daño reputacional y despidos."
+            },
+            {
+                question: "El conocimiento en LA/FT protege tanto a la empresa como al empleado",
+                correct: true,
+                explanation: "VERDADERO: La capacitación protege la reputación personal y laboral del empleado, además de la empresa."
+            }
+        ]
+    },
+    module2: {
+        questions: [
+            {
+                question: "El SAGRILAFT busca ___ los riesgos de LA/FT en las empresas.",
+                options: ["ignorar", "controlar", "aumentar"],
+                correct: 1,
+                explanation: "CONTROLAR es correcto. SAGRILAFT es un sistema para controlar y gestionar los riesgos."
+            },
+            {
+                question: "La SuperSociedades actúa como un ___ que protege la economía.",
+                options: ["obstáculo", "guardián", "competidor"],
+                correct: 1,
+                explanation: "GUARDIÁN es correcto. Las autoridades supervisan para proteger la economía de actividades ilícitas."
+            },
+            {
+                question: "Cada empleado es una ___ esencial para el cumplimiento.",
+                options: ["amenaza", "pieza", "distracción"],
+                correct: 1,
+                explanation: "PIEZA es correcto. Como en un puzzle, cada empleado es una pieza vital para el cumplimiento total."
+            },
+            {
+                question: "El SAGRILAFT funciona como un sistema de ___ y protección.",
+                options: ["alarma", "silencio", "confusión"],
+                correct: 0,
+                explanation: "ALARMA es correcto. SAGRILAFT alerta sobre riesgos potenciales y protege a las empresas."
+            }
+        ]
+    },
+    module3: {
+        dilemmas: [
+            {
+                scenario: "Un proveedor te ofrece entradas VIP para un concierto muy costoso a cambio de 'agilizar' su proceso de pago.",
+                options: [
+                    {text: "Acepto las entradas, es un regalo de agradecimiento", correct: false},
+                    {text: "Rechazo el regalo y explico las políticas de la empresa", correct: true},
+                    {text: "Acepto pero no acelero el proceso", correct: false}
+                ],
+                explanation: "La respuesta correcta es rechazar y explicar las políticas. Aceptar cualquier regalo en estas circunstancias constituye un conflicto de interés y potencial corrupción."
+            },
+            {
+                scenario: "Tu jefe te pide 'ajustar' algunos números en un informe para que se vea mejor ante los auditores.",
+                options: [
+                    {text: "Hago los ajustes porque es mi jefe quien lo pide", correct: false},
+                    {text: "Me niego y explico los riesgos de falsificar información", correct: true},
+                    {text: "Hago algunos ajustes menores para no crear conflicto", correct: false}
+                ],
+                explanation: "Negarse y explicar los riesgos es lo correcto. Falsificar información, sin importar quién lo solicite, es fraude y puede tener consecuencias legales graves."
+            },
+            {
+                scenario: "Un cliente importante ofrece contratar los servicios profesionales de tu cónyuge de forma independiente.",
+                options: [
+                    {text: "Acepto inmediatamente, es una oportunidad de negocio", correct: false},
+                    {text: "Declaro el conflicto de interés y busco aprobación", correct: true},
+                    {text: "Acepto pero mantengo el asunto en privado", correct: false}
+                ],
+                explanation: "Declarar el conflicto de interés es esencial. Los conflictos no son prohibidos por sí mismos, pero deben ser transparentes y manejados apropiadamente."
+            }
+        ]
+    },
+    module4: {
+        situations: [
+            {
+                situation: "Un cliente paga siempre en efectivo montos redondos muy altos (ej: $10,000,000 exactos)",
+                risk: true,
+                explanation: "SÍ es riesgo. Los montos redondos en efectivo por sumas altas son una señal típica de lavado de activos."
+            },
+            {
+                situation: "Un proveedor cambia de dueño cada 6 meses",
+                risk: true,
+                explanation: "SÍ es riesgo. Los cambios frecuentes de propiedad pueden indicar empresas de fachada."
+            },
+            {
+                situation: "Un cliente proporciona toda la documentación solicitada sin problemas",
+                risk: false,
+                explanation: "NO es riesgo. La transparencia y colaboración en la documentación es comportamiento normal."
+            },
+            {
+                situation: "Un empleado reporta sospechas a través de la línea ética",
+                risk: false,
+                explanation: "NO es riesgo. Reportar sospechas es el comportamiento esperado y correcto."
+            },
+            {
+                situation: "Un proveedor ofrece precios 50% menores que la competencia sin explicación clara",
+                risk: true,
+                explanation: "SÍ es riesgo. Precios anormalmente bajos sin justificación pueden indicar actividades ilícitas."
+            },
+            {
+                situation: "Un cliente solicita acelerar excesivamente un proceso 'porque tiene urgencia'",
+                risk: true,
+                explanation: "SÍ es riesgo. La urgencia injustificada es una táctica común para evitar controles de debida diligencia."
+            },
+            {
+                situation: "Un empleado asiste puntualmente a las capacitaciones de cumplimiento",
+                risk: false,
+                explanation: "NO es riesgo. Participar en capacitaciones es parte del comportamiento ético esperado."
+            },
+            {
+                situation: "Un cliente se muestra reticente a proporcionar información sobre su negocio",
+                risk: true,
+                explanation: "SÍ es riesgo. La falta de transparencia sobre la actividad económica es una señal de alerta."
+            }
+        ]
+    }
+};
+
+const finalExamQuestions = [
+    {
+        question: "¿Qué significa la sigla SAGRILAFT?",
+        options: [
+            "Sistema de Análisis y Gestión de Riesgos Integrales de Lavado de Activos y Financiación del Terrorismo",
+            "Sistema de Autocontrol y Gestión del Riesgo Integral de Lavado de Activos y Financiación del Terrorismo",
+            "Sistema Automático de Gestión de Riesgos de Lavado de Activos y Financiación del Terrorismo"
+        ],
+        correct: 1
+    },
+    {
+        question: "¿Cuál es la principal autoridad que supervisa el cumplimiento del SAGRILAFT?",
+        options: ["UIAF", "Supersociedades", "Fiscalía General de la Nación"],
+        correct: 1
+    },
+    {
+        question: "¿Qué es una alerta en el contexto de LA/FT?",
+        options: ["Una certeza de actividad ilícita", "Un indicio o situación sospechosa", "Una orden de investigación"],
+        correct: 1
+    },
+    {
+        question: "¿Qué significa PTEE?",
+        options: [
+            "Programa de Transparencia y Ética Empresarial",
+            "Protocolo de Transparencia en Entidades Empresariales",
+            "Programa Técnico de Ética Empresarial"
+        ],
+        correct: 0
+    },
+    {
+        question: "¿Cuál de estas es una señal de alerta típica en clientes?",
+        options: [
+            "Proporcionar toda la documentación solicitada",
+            "Pagos en efectivo por montos inusualmente grandes",
+            "Mantener comunicación constante con la empresa"
+        ],
+        correct: 1
+    },
+    {
+        question: "¿Qué protección tienen los empleados que reportan sospechas?",
+        options: [
+            "No tienen ninguna protección especial",
+            "Solo protección si la denuncia resulta cierta",
+            "Protección legal contra represalias y confidencialidad"
+        ],
+        correct: 2
+    },
+    {
+        question: "¿Cuál es la diferencia principal entre conflicto de interés y corrupción?",
+        options: [
+            "No hay diferencia, son lo mismo",
+            "El conflicto de interés bien manejado no es corrupción",
+            "La corrupción es menos grave que el conflicto de interés"
+        ],
+        correct: 1
+    },
+    {
+        question: "¿Qué porcentaje mínimo se requiere para aprobar este curso?",
+        options: ["70%", "80%", "90%"],
+        correct: 1
+    },
+    {
+        question: "¿Cuál es el objetivo principal de la Ley 2195 de 2022?",
+        options: [
+            "Eliminar el PTEE",
+            "Reforzar la obligatoriedad del PTEE para empresas que contraten con el Estado",
+            "Crear nuevas empresas públicas"
+        ],
+        correct: 1
+    },
+    {
+        question: "¿Qué deben hacer los empleados ante una situación sospechosa?",
+        options: [
+            "Investigar por cuenta propia",
+            "Ignorarla si no están seguros",
+            "Reportarla a través de los canales establecidos"
+        ],
+        correct: 2
+    }
+];
+
+// ===== AUTHENTICATION FUNCTIONS =====
+function validateAccessKey(key) {
+    return key === "PIRA_LA/FT";
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.className = `notification ${type} show`;
+
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000);
+}
+
+function showAuthError() {
+    const errorDiv = document.getElementById('authError');
+    errorDiv.classList.remove('hidden');
+    setTimeout(() => {
+        errorDiv.classList.add('hidden');
+    }, 3000);
+}
+
+// ===== USER REGISTRATION FUNCTIONS =====
+function formatName(name) {
+    return name.toUpperCase().replace(/[^A-Z\s]/g, '');
+}
+
+function validateDocNumber(docNumber) {
+    return /^[0-9]+$/.test(docNumber);
+}
+
+function checkUserExists(docNumber) {
+    return sheetsData.find(user => user.docNumber === docNumber);
+}
+
+function formatDate() {
+    const now = new Date();
+    return `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`;
+}
+
+function registerUser(userData) {
+    const newUser = {
+        id: sheetsData.length + 1,
+        docType: userData.docType,
+        docNumber: userData.docNumber,
+        fullName: formatName(userData.fullName),
+        startDate: formatDate(),
+        progress: "Módulo 1",
+        endDate: ""
+    };
+
+    sheetsData.push(newUser);
+
+    // Simulate Google Sheets API call
+    console.log("Registering user in Google Sheets:", newUser);
+
+    return newUser;
+}
+
+function updateUserProgress(userId, progress) {
+    const user = sheetsData.find(u => u.id === userId);
+    if (user) {
+        user.progress = progress;
+        console.log("Updating user progress in Google Sheets:", user);
+    }
+}
+
+function completeUserCourse(userId) {
+    const user = sheetsData.find(u => u.id === userId);
+    if (user) {
+        user.endDate = formatDate();
+        user.progress = "Completado";
+        console.log("Completing user course in Google Sheets:", user);
+    }
+}
+
+// ===== COURSE NAVIGATION FUNCTIONS =====
+function showModule(moduleNumber) {
+    // Hide all modules
+    document.querySelectorAll('.module-content').forEach(module => {
+        module.classList.add('hidden');
+    });
+
+    // Show selected module
+    document.getElementById(`module${moduleNumber}`).classList.remove('hidden');
+
+    // Update navigation tabs
+    document.querySelectorAll('.module-tab').forEach(tab => {
+        tab.classList.remove('border-pira-azul', 'text-pira-azul');
+        tab.classList.add('border-transparent', 'text-gray-500');
+    });
+
+    document.querySelector(`[data-module="${moduleNumber}"]`).classList.add('border-pira-azul', 'text-pira-azul');
+    document.querySelector(`[data-module="${moduleNumber}"]`).classList.remove('border-transparent', 'text-gray-500');
+
+    currentModule = moduleNumber;
+    updateProgress();
+    updateFloatingIndicator();
+
+    // Update user progress
+    if (currentUser) {
+        updateUserProgress(currentUser.id, `Módulo ${moduleNumber}`);
+    }
+
+    // Scroll to top
+    window.scrollTo(0, 0);
+}
+
+function updateProgress() {
+    const completedModules = Object.values(moduleProgress).filter(completed => completed).length;
+    courseProgress = (completedModules / 5) * 100;
+
+    document.getElementById('progressBar').style.width = `${courseProgress}%`;
+    document.getElementById('progressText').textContent = `${Math.round(courseProgress)}%`;
+}
+
+function updateFloatingIndicator() {
+    document.getElementById('floatingCurrentModule').textContent = currentModule;
+}
+
+function completeModule(moduleNumber) {
+    moduleProgress[moduleNumber] = true;
+    updateProgress();
+
+    showNotification(`¡Módulo ${moduleNumber} completado!`, 'success');
+}
+
+// ===== ACTIVITY FUNCTIONS =====
+function generateActivity1() {
+    const container = document.getElementById('activity1');
+    const questions = activities.module1.questions;
+
+    container.innerHTML = '';
+
+    questions.forEach((q, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'bg-white p-4 rounded-lg border border-gray-200';
+        questionDiv.innerHTML = `
+            <h4 class="font-medium text-gray-800 mb-3">${index + 1}. ${q.question}</h4>
+            <div class="space-y-2">
+                <button class="question-option w-full text-left" data-question="${index}" data-answer="true">
+                    <i class="fas fa-check-circle text-green-500 mr-2"></i>Verdadero
+                </button>
+                <button class="question-option w-full text-left" data-question="${index}" data-answer="false">
+                    <i class="fas fa-times-circle text-red-500 mr-2"></i>Falso
+                </button>
+            </div>
+            <div id="explanation${index}" class="hidden mt-3 p-3 bg-gray-50 rounded-lg text-sm"></div>
+        `;
+
+        container.appendChild(questionDiv);
+    });
+
+    // Add event listeners
+    container.addEventListener('click', (e) => {
+        if (e.target.classList.contains('question-option') || e.target.parentElement.classList.contains('question-option')) {
+            const button = e.target.classList.contains('question-option') ? e.target : e.target.parentElement;
+            const questionIndex = button.dataset.question;
+            const userAnswer = button.dataset.answer === 'true';
+            const question = questions[questionIndex];
+
+            // Remove previous selections
+            const questionDiv = button.closest('.bg-white');
+            questionDiv.querySelectorAll('.question-option').forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+
+            // Mark selected answer
+            button.classList.add('selected');
+
+            // Show correct/incorrect styling
+            if (userAnswer === question.correct) {
+                button.classList.add('correct');
+            } else {
+                button.classList.add('incorrect');
+                // Highlight correct answer
+                const correctButton = questionDiv.querySelector(`[data-answer="${question.correct}"]`);
+                correctButton.classList.add('correct');
+            }
+
+            // Show explanation
+            const explanationDiv = document.getElementById(`explanation${questionIndex}`);
+            explanationDiv.innerHTML = question.explanation;
+            explanationDiv.classList.remove('hidden');
+        }
+    });
+}
+
+function generateActivity2() {
+    const container = document.getElementById('activity2');
+    const questions = activities.module2.questions;
+
+    container.innerHTML = '';
+
+    questions.forEach((q, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'bg-white p-4 rounded-lg border border-gray-200';
+        questionDiv.innerHTML = `
+            <h4 class="font-medium text-gray-800 mb-3">${index + 1}. ${q.question}</h4>
+            <div class="grid grid-cols-3 gap-2">
+                ${q.options.map((option, optIndex) => `
+                    <button class="question-option text-center py-2" data-question="${index}" data-answer="${optIndex}">
+                        ${option}
+                    </button>
+                `).join('')}
+            </div>
+            <div id="explanation${index}" class="hidden mt-3 p-3 bg-gray-50 rounded-lg text-sm"></div>
+        `;
+
+        container.appendChild(questionDiv);
+    });
+
+    // Add event listeners
+    container.addEventListener('click', (e) => {
+        if (e.target.classList.contains('question-option')) {
+            const button = e.target;
+            const questionIndex = parseInt(button.dataset.question);
+            const userAnswer = parseInt(button.dataset.answer);
+            const question = questions[questionIndex];
+
+            // Remove previous selections
+            const questionDiv = button.closest('.bg-white');
+            questionDiv.querySelectorAll('.question-option').forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+
+            // Mark selected answer
+            button.classList.add('selected');
+
+            // Show correct/incorrect styling
+            if (userAnswer === question.correct) {
+                button.classList.add('correct');
+            } else {
+                button.classList.add('incorrect');
+                // Highlight correct answer
+                const correctButton = questionDiv.querySelectorAll('.question-option')[question.correct];
+                correctButton.classList.add('correct');
+            }
+
+            // Show explanation
+            const explanationDiv = document.getElementById(`explanation${questionIndex}`);
+            explanationDiv.innerHTML = question.explanation;
+            explanationDiv.classList.remove('hidden');
+        }
+    });
+}
+
+function generateActivity3() {
+    const container = document.getElementById('activity3');
+    const dilemmas = activities.module3.dilemmas;
+
+    container.innerHTML = '';
+
+    dilemmas.forEach((dilemma, index) => {
+        const dilemmaDiv = document.createElement('div');
+        dilemmaDiv.className = 'bg-white p-6 rounded-lg border border-gray-200';
+        dilemmaDiv.innerHTML = `
+            <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400 mb-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Dilema ${index + 1}:</h4>
+                <p class="text-gray-700 text-sm">${dilemma.scenario}</p>
+            </div>
+            <h5 class="font-medium text-gray-800 mb-3">¿Qué harías?</h5>
+            <div class="space-y-2 mb-4">
+                ${dilemma.options.map((option, optIndex) => `
+                    <button class="question-option w-full text-left p-3" data-question="${index}" data-answer="${optIndex}">
+                        ${option.text}
+                    </button>
+                `).join('')}
+            </div>
+            <div id="explanation${index}" class="hidden mt-3 p-3 bg-gray-50 rounded-lg text-sm"></div>
+        `;
+
+        container.appendChild(dilemmaDiv);
+    });
+
+    // Add event listeners
+    container.addEventListener('click', (e) => {
+        if (e.target.classList.contains('question-option')) {
+            const button = e.target;
+            const questionIndex = parseInt(button.dataset.question);
+            const userAnswer = parseInt(button.dataset.answer);
+            const dilemma = dilemmas[questionIndex];
+            const isCorrect = dilemma.options[userAnswer].correct;
+
+            const questionDiv = button.closest('.bg-white');
+            questionDiv.querySelectorAll('.question-option').forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+
+            button.classList.add('selected');
+            if (isCorrect) {
+                button.classList.add('correct');
+            } else {
+                button.classList.add('incorrect');
+                const correctButton = questionDiv.querySelector(`[data-answer="${dilemma.options.findIndex(o => o.correct)}"]`);
+                correctButton.classList.add('correct');
+            }
+
+            const explanationDiv = document.getElementById(`explanation${questionIndex}`);
+            explanationDiv.innerHTML = `<h5 class="font-semibold mb-2">Explicación:</h5><p>${dilemma.explanation}</p>`;
+            explanationDiv.classList.remove('hidden');
+        }
+    });
+}
+
+
+function generateActivity4() {
+    const container = document.getElementById('activity4');
+    const situations = activities.module4.situations;
+
+    container.innerHTML = '';
+
+    situations.forEach((s, index) => {
+        const situationDiv = document.createElement('div');
+        situationDiv.className = 'bg-white p-4 rounded-lg border border-gray-200';
+        situationDiv.innerHTML = `
+            <div class="flex items-center justify-between">
+                <p class="text-sm text-gray-700">${s.situation}</p>
+                <div class="flex items-center space-x-2">
+                    <button class="question-option px-4 py-2" data-question="${index}" data-answer="true">
+                        <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>Riesgo
+                    </button>
+                    <button class="question-option px-4 py-2" data-question="${index}" data-answer="false">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>No Riesgo
+                    </button>
+                </div>
+            </div>
+            <div id="explanation_activity4_${index}" class="hidden w-full mt-3 p-3 bg-gray-50 rounded-lg text-sm"></div>
+        `;
+
+        container.appendChild(situationDiv);
+    });
+
+    // Add event listeners
+    container.addEventListener('click', (e) => {
+        if (e.target.classList.contains('question-option') || e.target.parentElement.classList.contains('question-option')) {
+            const button = e.target.classList.contains('question-option') ? e.target : e.target.parentElement;
+            const questionIndex = button.dataset.question;
+            const userAnswer = button.dataset.answer === 'true';
+            const situation = situations[questionIndex];
+
+            const situationDiv = button.closest('.bg-white');
+            situationDiv.querySelectorAll('.question-option').forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+
+            button.classList.add('selected');
+
+            if (userAnswer === situation.risk) {
+                button.classList.add('correct');
+            } else {
+                button.classList.add('incorrect');
+                const correctButton = situationDiv.querySelector(`[data-answer="${situation.risk}"]`);
+                correctButton.classList.add('correct');
+            }
+
+            const explanationDiv = situationDiv.querySelector(`#explanation_activity4_${questionIndex}`);
+            explanationDiv.innerHTML = situation.explanation;
+            explanationDiv.classList.remove('hidden');
+        }
+    });
+}
+
+function generateAutodiagnosis() {
+    const container = document.getElementById('autodiagnosis');
+    const questions = [
+        "Me siento seguro de mi capacidad para identificar una señal de alerta de LA/FT.",
+        "Conozco los canales de denuncia de mi empresa y me sentiría cómodo usándolos.",
+        "Entiendo la diferencia entre un conflicto de interés y un acto de corrupción.",
+        "Comprendo que mis acciones diarias impactan en la reputación de la empresa.",
+        "Me comprometo a aplicar lo aprendido en este curso en mi trabajo diario."
+    ];
+
+    container.innerHTML = '';
+    questions.forEach((q, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'bg-white p-4 rounded-lg border border-gray-200';
+        questionDiv.innerHTML = `
+            <p class="text-gray-700 mb-3">${q}</p>
+            <div class="flex justify-around">
+                <label class="flex items-center space-x-2"><input type="radio" name="diag${index}" value="1"><span>Totalmente en desacuerdo</span></label>
+                <label class="flex items-center space-x-2"><input type="radio" name="diag${index}" value="2"><span>En desacuerdo</span></label>
+                <label class="flex items-center space-x-2"><input type="radio" name="diag${index}" value="3"><span>Neutral</span></label>
+                <label class="flex items-center space-x-2"><input type="radio" name="diag${index}" value="4"><span>De acuerdo</span></label>
+                <label class="flex items-center space-x-2"><input type="radio" name="diag${index}" value="5"><span>Totalmente de acuerdo</span></label>
+            </div>
+        `;
+        container.appendChild(questionDiv);
+    });
+
+    const button = document.createElement('button');
+    button.id = 'submitAutodiagnosis';
+    button.className = 'btn-pira pira-purpura text-white mt-4';
+    button.innerHTML = '<i class="fas fa-check mr-2"></i>Ver mi reflexión';
+    container.appendChild(button);
+
+    button.addEventListener('click', () => {
+        const resultsContainer = document.getElementById('autodiagnosisResults');
+        const insightContainer = document.getElementById('autodiagnosisInsight');
+        let totalScore = 0;
+        let answeredQuestions = 0;
+        questions.forEach((q, index) => {
+            const selected = document.querySelector(`input[name="diag${index}"]:checked`);
+            if (selected) {
+                totalScore += parseInt(selected.value);
+                answeredQuestions++;
+            }
+        });
+
+        let insightText = '';
+        if (answeredQuestions < questions.length) {
+            insightText = 'Por favor, responde a todas las preguntas para generar tu reflexión.';
+        } else {
+            const average = totalScore / questions.length;
+            if (average < 3) {
+                insightText = 'Parece que hay áreas en las que podrías fortalecer tu confianza y conocimiento. Te animamos a repasar los módulos del curso, especialmente aquellos donde sientas más dudas. Recuerda que el equipo de cumplimiento está para apoyarte.';
+            } else if (average >= 3 && average < 4) {
+                insightText = 'Tienes una buena base de conocimiento y conciencia ética. Sigue fortaleciendo tu confianza y no dudes in consultar los materiales de apoyo o al oficial de cumplimiento cuando tengas dudas. ¡Vas por buen camino!';
+            } else {
+                insightText = '¡Excelente! Demuestras un alto nivel de confianza y compromiso con la cultura de integridad. Tu rol es clave para ser un ejemplo a seguir en tu equipo. Sigue así y no bajes la guardia.';
+            }
+        }
+        insightContainer.innerHTML = `<p>${insightText}</p>`;
+        resultsContainer.classList.remove('hidden');
+    });
+}
+
+
+// ===== FINAL EXAM & CERTIFICATION =====
+function generateFinalExam() {
+    const container = document.getElementById('finalExam');
+    container.innerHTML = '';
+
+    finalExamQuestions.forEach((q, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'bg-white p-4 rounded-lg border border-gray-200';
+        questionDiv.innerHTML = `
+            <h4 class="font-medium text-gray-800 mb-3">${index + 1}. ${q.question}</h4>
+            <div class="space-y-2">
+                ${q.options.map((option, optIndex) => `
+                    <div class="question-option">
+                        <input type="radio" name="question${index}" id="q${index}o${optIndex}" value="${optIndex}" class="mr-2">
+                        <label for="q${index}o${optIndex}">${option}</label>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        container.appendChild(questionDiv);
+    });
+}
+
+function submitFinalExam() {
+    let score = 0;
+    finalExamQuestions.forEach((q, index) => {
+        const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+        if (selectedOption && parseInt(selectedOption.value) === q.correct) {
+            score++;
+        }
+    });
+
+    const percentage = (score / finalExamQuestions.length) * 100;
+    const passed = percentage >= 80;
+
+    const resultsDiv = document.getElementById('examResults');
+    resultsDiv.innerHTML = `
+        <div class="p-6 rounded-lg text-center ${passed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'} border">
+            <h3 class="text-2xl font-bold ${passed ? 'text-green-700' : 'text-red-700'} mb-2">
+                ${passed ? '¡Aprobado!' : 'Inténtalo de Nuevo'}
+            </h3>
+            <p class="text-lg font-medium text-gray-800">Tu calificación: ${percentage.toFixed(0)}%</p>
+            <p class="text-sm text-gray-600 mt-2">
+                ${passed ? 'Has completado exitosamente el curso. ¡Felicitaciones!' : 'Necesitas un 80% para aprobar. Repasa los módulos e inténtalo de nuevo.'}
+            </p>
+        </div>
+    `;
+    resultsDiv.classList.remove('hidden');
+
+    if (passed) {
+        document.getElementById('certificationSection').classList.remove('hidden');
+        document.getElementById('certUserName').textContent = currentUser.fullName;
+        document.getElementById('certUserDoc').textContent = `${currentUser.docType} ${currentUser.docNumber}`;
+        document.getElementById('certDate').textContent = formatDate();
+        document.getElementById('certScore').textContent = `${percentage.toFixed(0)}%`;
+        completeUserCourse(currentUser.id);
+        completeModule(5);
+    }
+}
+
+// ===== EVENT LISTENERS =====
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Authentication ---
+    const authForm = document.getElementById('authForm');
+    authForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const accessKey = document.getElementById('accessKey').value;
+
+        if (validateAccessKey(accessKey)) {
+            document.getElementById('authScreen').classList.add('hidden');
+            document.getElementById('registrationScreen').classList.remove('hidden');
+        } else {
+            showAuthError();
+        }
+    });
+
+    // --- Registration ---
+    const registrationForm = document.getElementById('registrationForm');
+    registrationForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const docType = document.getElementById('docType').value;
+        const docNumber = document.getElementById('docNumber').value;
+        const fullName = document.getElementById('fullName').value;
+        const regSpinner = document.getElementById('regSpinner');
+        const regButtonText = document.getElementById('regButtonText');
+
+        if (!validateDocNumber(docNumber)) {
+            document.getElementById('regError').textContent = 'El número de documento solo debe contener números.';
+            document.getElementById('regError').classList.remove('hidden');
+            return;
+        }
+
+        regSpinner.classList.remove('hidden');
+        regButtonText.textContent = 'Registrando...';
+
+        setTimeout(() => {
+            const existingUser = checkUserExists(docNumber);
+            if (existingUser) {
+                currentUser = existingUser;
+                document.getElementById('welcomeMessage').textContent = `Hola, ${currentUser.fullName.split(' ')[0]}.`;
+                document.getElementById('registrationScreen').classList.add('hidden');
+                document.getElementById('welcomeBackScreen').classList.remove('hidden');
+            } else {
+                currentUser = registerUser({ docType, docNumber, fullName });
+                document.getElementById('userNameHeader').textContent = currentUser.fullName;
+                document.getElementById('userDocHeader').textContent = `${currentUser.docType} ${currentUser.docNumber}`;
+                document.getElementById('registrationScreen').classList.add('hidden');
+                document.getElementById('courseApp').classList.remove('hidden');
+                showModule(1);
+            }
+            regSpinner.classList.add('hidden');
+            regButtonText.textContent = 'Registrarse';
+        }, 1000);
+    });
+
+    // --- Welcome Back ---
+    document.getElementById('continueBtn').addEventListener('click', () => {
+        document.getElementById('welcomeBackScreen').classList.add('hidden');
+        document.getElementById('courseApp').classList.remove('hidden');
+        const lastModule = parseInt(currentUser.progress.replace('Módulo ', '')) || 1;
+        showModule(lastModule);
+        document.getElementById('userNameHeader').textContent = currentUser.fullName;
+        document.getElementById('userDocHeader').textContent = `${currentUser.docType} ${currentUser.docNumber}`;
+    });
+
+    // --- Logout ---
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        currentUser = null;
+        document.getElementById('courseApp').classList.add('hidden');
+        document.getElementById('authScreen').classList.remove('hidden');
+        document.getElementById('accessKey').value = '';
+    });
+
+    // --- Module Navigation ---
+    document.querySelectorAll('.module-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const moduleNumber = parseInt(tab.dataset.module);
+            showModule(moduleNumber);
+        });
+    });
+
+    document.getElementById('nextModule1').addEventListener('click', () => { completeModule(1); showModule(2); });
+    document.getElementById('prevModule2').addEventListener('click', () => showModule(1));
+    document.getElementById('nextModule2').addEventListener('click', () => { completeModule(2); showModule(3); });
+    document.getElementById('prevModule3').addEventListener('click', () => showModule(2));
+    document.getElementById('nextModule3').addEventListener('click', () => { completeModule(3); showModule(4); });
+    document.getElementById('prevModule4').addEventListener('click', () => showModule(3));
+    document.getElementById('nextModule4').addEventListener('click', () => { completeModule(4); showModule(5); });
+    document.getElementById('prevModule5').addEventListener('click', () => showModule(4));
+
+    // --- Final Exam ---
+    document.getElementById('submitFinalExam').addEventListener('click', submitFinalExam);
+
+    // --- PDF Generation ---
+    document.getElementById('downloadCertificate').addEventListener('click', () => {
+        const { jsPDF } = window.jspdf;
+        const certificate = document.getElementById('certificationSection');
+
+        html2canvas(certificate).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save('certificado.pdf');
+        });
+    });
+
+    document.getElementById('downloadGuide').addEventListener('click', () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text("Guía Rápida de Actuación", 20, 20);
+        doc.text("1. Identificar la señal de alerta.", 20, 30);
+        doc.text("2. No alertar al sospechoso.", 20, 40);
+        doc.text("3. Reportar al Oficial de Cumplimiento.", 20, 50);
+        doc.save('guia_rapida.pdf');
+    });
+
+    // --- Initialize Activities ---
+    generateActivity1();
+    generateActivity2();
+    generateActivity3();
+    generateActivity4();
+    generateAutodiagnosis();
+    generateFinalExam();
+});
+
+</script>
+</body>
+</html>
